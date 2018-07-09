@@ -1,16 +1,17 @@
-﻿import { platform } from './Environment'
-import { registerFunction } from './Interop/RegisteredFunction';
-import { navigateTo } from './Services/UriHelper';
-import { invokeDotNetMethod, invokeDotNetMethodAsync } from './Interop/InvokeDotNetMethodWithJsonMarshalling';
+import { platform } from './Environment';
+import { navigateTo, internalFunctions as uriHelperInternalFunctions } from './Services/UriHelper';
+import { internalFunctions as httpInternalFunctions } from './Services/Http';
+import { attachRootComponentToElement } from './Rendering/Renderer';
+import { Pointer } from './Platform/Platform';
 
-if (typeof window !== 'undefined') {
-  // When the library is loaded in a browser via a <script> element, make the
-  // following APIs available in global scope for invocation from JS
-  window['Blazor'] = {
-    platform,
-    registerFunction,
-    navigateTo,
-    invokeDotNetMethod,
-    invokeDotNetMethodAsync
-  };
-}
+// Make the following APIs available in global scope for invocation from JS
+window['Blazor'] = {
+  platform,
+  navigateTo,
+
+  _internal: {
+    attachRootComponentToElement,
+    http: httpInternalFunctions,
+    uriHelper: uriHelperInternalFunctions
+  }
+};

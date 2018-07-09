@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -26,7 +26,9 @@ namespace Microsoft.AspNetCore.Blazor.Build.Test
                 "Microsoft.AspNetCore.Blazor.Browser.dll",
                 "Microsoft.AspNetCore.Blazor.dll",
                 "Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-                "Microsoft.Extensions.DependencyInjection.dll"
+                "Microsoft.Extensions.DependencyInjection.dll",
+                "Microsoft.JSInterop.dll",
+                "Mono.WebAssembly.Interop.dll",
             }.Select(a => hintPaths.Single(p => Path.GetFileName(p) == a))
             .ToArray();
 
@@ -56,24 +58,44 @@ namespace Microsoft.AspNetCore.Blazor.Build.Test
                  uncalled implementation code from mscorlib.dll anyway.
                  */
                 "Microsoft.AspNetCore.Blazor.Browser.dll",
+                "Microsoft.AspNetCore.Blazor.Browser.pdb",
                 "Microsoft.AspNetCore.Blazor.dll",
+                "Microsoft.AspNetCore.Blazor.pdb",
                 "Microsoft.Extensions.DependencyInjection.Abstractions.dll",
                 "Microsoft.Extensions.DependencyInjection.dll",
+                "Microsoft.JSInterop.dll",
+                "Microsoft.JSInterop.pdb",
                 "Mono.Security.dll",
+                "Mono.WebAssembly.Interop.dll",
+                "Mono.WebAssembly.Interop.pdb",
                 "mscorlib.dll",
                 "netstandard.dll",
                 "StandaloneApp.dll",
+                "StandaloneApp.pdb",
+                "System.dll",
+                "System.Collections.Concurrent.dll",
+                "System.Collections.dll",
                 "System.ComponentModel.Composition.dll",
+                "System.ComponentModel.dll",
                 "System.Core.dll",
                 "System.Data.dll",
-                "System.dll",
+                "System.Diagnostics.Debug.dll",
                 "System.Drawing.dll",
                 "System.IO.Compression.dll",
                 "System.IO.Compression.FileSystem.dll",
+                "System.Linq.dll",
+                "System.Linq.Expressions.dll",
                 "System.Net.Http.dll",
                 "System.Numerics.dll",
+                "System.Reflection.Emit.ILGeneration.dll",
+                "System.Reflection.Emit.Lightweight.dll",
+                "System.Reflection.Primitives.dll",
+                "System.Resources.ResourceManager.dll",
+                "System.Runtime.dll",
+                "System.Runtime.Extensions.dll",
                 "System.Runtime.Serialization.dll",
                 "System.ServiceModel.Internals.dll",
+                "System.Threading.dll",
                 "System.Transactions.dll",
                 "System.Web.Services.dll",
                 "System.Xml.dll",

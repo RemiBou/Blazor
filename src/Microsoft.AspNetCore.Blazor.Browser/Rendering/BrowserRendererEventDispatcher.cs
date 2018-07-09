@@ -1,8 +1,7 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Blazor.Browser.Interop;
-using Microsoft.AspNetCore.Blazor.RenderTree;
+using Microsoft.JSInterop;
 using System;
 
 namespace Microsoft.AspNetCore.Blazor.Browser.Rendering
@@ -11,15 +10,26 @@ namespace Microsoft.AspNetCore.Blazor.Browser.Rendering
     /// Provides mechanisms for dispatching events to components in a <see cref="BrowserRenderer"/>.
     /// This is marked 'internal' because it only gets invoked from JS code.
     /// </summary>
-    internal static class BrowserRendererEventDispatcher
+    public static class BrowserRendererEventDispatcher
     {
-        // We receive the information as JSON strings because of current interop limitations:
-        // - Can't pass unboxed value types from JS to .NET (yet all the IDs are ints)
-        // - Can't pass more than 4 args from JS to .NET
-        // This can be simplified in the future when the Mono WASM runtime is enhanced.
-        public static void DispatchEvent(string eventDescriptorJson, string eventArgsJson)
+        // TODO: Fix this for multi-user scenarios. Currently it doesn't stop people from
+        // triggering events for other people by passing an arbitrary browserRendererId.
+        //
+        // Preferred fix: Instead of storing the Renderer instances in a static dictionary
+        // store them within the context of a Circuit. Then we'll only look up the ones
+        // associated with the caller's circuit. This takes care of ensuring they are
+        // released when the circuit is closed too.
+        //
+        // More generally, we must move away from using statics for any per-user state
+        // now that we have multi-user scenarios.
+
+        /// <summary>
+        /// For framework use only.
+        /// </summary>
+        [JSInvokable(nameof(DispatchEvent))]
+        public static void DispatchEvent(
+            BrowserEventDescriptor eventDescriptor, string eventArgsJson)
         {
-            var eventDescriptor = JsonUtil.Deserialize<BrowserEventDescriptor>(eventDescriptorJson);
             var eventArgs = ParseEventArgsJson(eventDescriptor.EventArgsType, eventArgsJson);
             var browserRenderer = BrowserRendererRegistry.Find(eventDescriptor.BrowserRendererId);
             browserRenderer.DispatchBrowserEvent(
@@ -33,39 +43,57 @@ namespace Microsoft.AspNetCore.Blazor.Browser.Rendering
             switch (eventArgsType)
             {
                 case "change":
-                    return JsonUtil.Deserialize<UIChangeEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIChangeEventArgs>(eventArgsJson);
                 case "clipboard":
-                    return JsonUtil.Deserialize<UIClipboardEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIClipboardEventArgs>(eventArgsJson);
                 case "drag":
-                    return JsonUtil.Deserialize<UIDragEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIDragEventArgs>(eventArgsJson);
                 case "error":
-                    return JsonUtil.Deserialize<UIErrorEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIErrorEventArgs>(eventArgsJson);
                 case "focus":
-                    return JsonUtil.Deserialize<UIFocusEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIFocusEventArgs>(eventArgsJson);
                 case "keyboard":
-                    return JsonUtil.Deserialize<UIKeyboardEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIKeyboardEventArgs>(eventArgsJson);
                 case "mouse":
-                    return JsonUtil.Deserialize<UIMouseEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIMouseEventArgs>(eventArgsJson);
                 case "pointer":
-                    return JsonUtil.Deserialize<UIPointerEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIPointerEventArgs>(eventArgsJson);
                 case "progress":
-                    return JsonUtil.Deserialize<UIProgressEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIProgressEventArgs>(eventArgsJson);
                 case "touch":
-                    return JsonUtil.Deserialize<UITouchEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UITouchEventArgs>(eventArgsJson);
                 case "unknown":
-                    return JsonUtil.Deserialize<UIEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIEventArgs>(eventArgsJson);
                 case "wheel":
-                    return JsonUtil.Deserialize<UIWheelEventArgs>(eventArgsJson);
+                    return Json.Deserialize<UIWheelEventArgs>(eventArgsJson);
                 default:
                      throw new ArgumentException($"Unsupported value '{eventArgsType}'.", nameof(eventArgsType));
             }
         }
 
-        private class BrowserEventDescriptor
+        /// <summary>
+        /// For framework use only.
+        /// </summary>
+        public class BrowserEventDescriptor
         {
+            /// <summary>
+            /// For framework use only.
+            /// </summary>
             public int BrowserRendererId { get; set; }
+
+            /// <summary>
+            /// For framework use only.
+            /// </summary>
             public int ComponentId { get; set; }
+
+            /// <summary>
+            /// For framework use only.
+            /// </summary>
             public int EventHandlerId { get; set; }
+
+            /// <summary>
+            /// For framework use only.
+            /// </summary>
             public string EventArgsType { get; set; }
         }
     }

@@ -1,17 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor" TreatAsLocalProperty="BlazorLinkOnBuild">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor" TreatAsLocalProperty="BlazorLinkOnBuild">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <BlazorLinkOnBuild>false</BlazorLinkOnBuild>
+
+    <!-- loader.js is hard-coded to assume it can load .pdbs regardless of Debug/Release configuration -->
+    <BlazorEnableDebugging>true</BlazorEnableDebugging>
   </PropertyGroup>
 
   <!-- Local alternative to <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" /> -->
   <Import Project="..\..\src\Microsoft.AspNetCore.Blazor.Build\ReferenceFromSource.props" />
 
   <ItemGroup>
-    <!-- Share the WebAssembly.Runtime.cs source here so we get access to the same interop externs -->
-    <Compile Include="..\..\src\Microsoft.AspNetCore.Blazor.Browser\Interop\WebAssembly.Runtime.cs" />
+    <!-- Share the InternalCalls.cs source here so we get access to the same interop externs -->
+    <Compile Include="..\..\src\Mono.WebAssembly.Interop\InternalCalls.cs" />
   </ItemGroup>
 
 </Project>
